@@ -2,7 +2,6 @@ package practica4;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 
 public class PruebaContenedor {
@@ -114,130 +113,119 @@ public class PruebaContenedor {
         }
 
         // Comienzan las pruebas de tiempos.
-        try {
-            System.out.println("Ejecucion de pruebas:\n");
-            RandomAccessFile datosDat = new RandomAccessFile("datos.dat", "r"); 	// Permite leer el fichero datos.dat
-            RandomAccessFile datosNoDat = new RandomAccessFile("datos_no.dat", "r");	// Permitimos leer el fichero datos_no.dat
-            BufferedWriter salida4 = new BufferedWriter(new FileWriter("salida4.txt"));	// Permite escribir en el fichero salida			// Inicializacion de variables
+        System.out.println("[+] INICIANDO PRUEBAS DE CONTENEDOR");
+        RandomAccessFile datosDat = new RandomAccessFile("datos.dat", "r");
+        RandomAccessFile datosNoDat = new RandomAccessFile("datos_no.dat", "r");
+        BufferedWriter salida4 = new BufferedWriter(new FileWriter("salida4.txt"));
 
-            double princ = 0;	// Almacena el tiempo inicial del sistema en milisegundos
-            double fin = 0;	// Almacena el tiempo final del sistema en milisegundos
-            double time = 0;	// Almacena el tiempo final (fin-princ)
+        double init = 0;
+        double stop = 0;
 
-            // Creamos dos vectores, uno con los elementos de datos.dat y otro con los elementos de datos_no.dat
-            int[] datos = new int[100000];
-            for (int m = 0; m < 100000; m++) {
-                datos[m] = datosDat.readInt();
-            }
-            datosDat.close();
-
-            int[] noDatos = new int[20000];
-            for (int n = 0; n < 20000; n++) {
-                noDatos[n] = datosNoDat.readInt();
-            }
-            datosNoDat.close();
-
-            //Realizamos las inserciones y calculamos los tiempos promedios por cada 10000 inserciones
-            salida4.write("PRUEBA INSERCIONES: ");
-            salida4.write("Tiempos de las inserciones en el contenedor: \n");
-            for (int t = 0; t < arbolesb.length; t++) {
-                salida4.newLine();
-                salida4.write("Orden " + Orden[t] + ":\n");
-                salida4.newLine();
-                princ = System.nanoTime();	//	Inicializamos con el tiempo del sistema
-                for (int i = 0; i < 10; i++) {	//Tenemos en cuenta 100000 elementos
-                    for (int j = 0; j < 10000; j++) {
-                        arbolesb[t].insertar(datos[j + (i * 10000)]);
-                    }
-                    
-                    fin = System.nanoTime();
-                    time = (fin - princ) / 10000000;
-                    salida4.write(Double.toString(time) + " ms");
-                    salida4.newLine();
-                    time = 0;
-                    princ = System.nanoTime();	// Inicializamos con el tiempo del sistema
-                }
-            }
-
-            //Comenzamos el algoritmo para las extracciones y el calculo de sus tiempos
-            salida4.write("\n");
-            salida4.write("PRUEBA EXTRACCIONES:");
-            salida4.write("Tiempos de las extracciones del contenedor: \n");
-            for (int t = 0; t < arbolesb.length; t++) {
-                salida4.newLine();
-                salida4.write("Orden " + Orden[t] + ":\n");
-                salida4.newLine();
-                princ = System.nanoTime();	//	Inicializamos con el tiempo del sistema
-                for (int j = 0; j < datos.length; j++) {	// Leemos todo los elementos del fichero datos.dat
-                    arbolesb[t].extraer(datos[j]);	// Extraemos el primer valor del contenedor
-                    if (arbolesb[t].cardinal() % 10000 == 0) {	//Cada vez que insertemos 10000 palabras calculamos el tiempo medio
-                        fin = System.nanoTime();
-                        time = (fin - princ) / 10000000;
-                        salida4.write(Double.toString(time) + " ms");
-                        salida4.newLine();
-                        time = 0;
-                        princ = System.nanoTime();	//	Inicializamos con el tiempo del sistema
-                    }
-                }
-            }
-
-            // Vaciamos los contenedores con el fin de insertar de nuevo los elementos
-            for (int t = 0; t < arbolesb.length; t++) {
-                arbolesb[t].vaciar();
-            }
-            //	Comenzamos el algoritmo para las busquedas exitosas y el calculo de sus tiempos 
-            salida4.write("\n");
-            salida4.write("Tercera prueba: \nTiempos de las busquedas exitosas del contenedor: \n");
-
-            for (int t = 0; t < arbolesb.length; t++) {
-                salida4.write("Orden " + Orden[t] + ":\n");
-                for (int k = 0; k < datos.length; k++) {	// Leemos todo los elementos del fichero datos.dat
-                    arbolesb[t].insertar(datos[k]);
-                    if (arbolesb[t].cardinal() % 10000 == 0 && k != 0) {
-                        int[] z = arbolesb[t].elementos();	// Creamos un array con los elementos del contenedor
-                        princ = System.currentTimeMillis();	// Inicializamos el tiempo de busqueda
-                        for (int m = 0; m < k; m++) {
-                            arbolesb[t].buscar(z[m]);
-                        }
-                        fin = System.currentTimeMillis();
-                        time = (fin - princ) / (k / 1000);
-                        salida4.write(Double.toString(time) + " ms");
-                        salida4.newLine();
-                        time = 0;
-                    }
-                }
-            }
-
-            System.out.println("Busquedas exitosas realizadas --> Proceso total: 75%");
-            // Vaciamos los contenedores con el fin de insertar de nuevo los elementos
-            for (int t = 0; t < arbolesb.length; t++) {
-                arbolesb[t].vaciar();
-            }
-
-            // Comenzamos el algoritmo para las busquedas infructuosas y el cÃƒÂ¡lculo de sus tiempos 
-            salida4.write("\n");
-            salida4.write("Cuarta prueba: \nTiempos de las busquedas infructuosas del contenedor: \n");
-            for (int t = 0; t < arbolesb.length; t++) {
-                salida4.write("Orden " + Orden[t] + ":\n");
-                for (int h = 0; h < datos.length; h++) {	// Leemos todo los elementos del fichero datos.dat
-                    arbolesb[t].insertar(datos[h]);
-                    if (arbolesb[t].cardinal() % 10000 == 0) {
-                        princ = System.nanoTime();
-                        for (int y = 0; y < 20000; y++) {	// Leemos los 20000 elementos del fichero datos_no.dat
-                            arbolesb[t].buscar(noDatos[y]);
-                        }
-                        fin = System.nanoTime();
-                        time = (fin - princ) / (20000000);
-                        salida4.write(Double.toString(time) + " ms");
-                        salida4.newLine();
-                        time = 0;
-                    }
-                }
-            }
-            salida4.close();
-            System.out.println("P4: Busquedas infructuosas realizadas --> Proceso total: 100%");
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+        int[] datos = new int[100000];
+        for (int m = 0; m < 100000; m++) {
+            datos[m] = datosDat.readInt();
         }
+        datosDat.close();
+
+        int[] noDatos = new int[20000];
+        for (int n = 0; n < 20000; n++) {
+            noDatos[n] = datosNoDat.readInt();
+        }
+        datosNoDat.close();
+
+        salida4.write("[+] PRUEBA INSERCIONES");
+        for (int i = 0; i < arbolesb.length; i++) {
+            salida4.newLine();
+            salida4.write("Orden " + Orden[i] + " : ");
+            salida4.newLine();
+            init = System.nanoTime();
+            for (int j = 0; j < 10; j++) {
+                for (int k = 0; k < 10000; k++) {
+                    arbolesb[i].insertar(datos[k + (j * 10000)]);
+                }
+
+                stop = System.nanoTime();
+                salida4.write(Double.toString((stop - init) / 10000000.) + " ms");
+                salida4.newLine();
+                init = System.nanoTime();
+            }
+        }
+
+        salida4.newLine();
+        salida4.write("[+] PRUEBA EXTRACCIONES");
+        for (int i = 0; i < arbolesb.length; i++) {
+            salida4.newLine();
+            salida4.write("Orden " + Orden[i] + " : ");
+            salida4.newLine();
+            init = System.nanoTime();
+            for (int j = 0; j < 10; j++) {
+                for (int k = 0; k < 10000; k++) {
+                    arbolesb[i].extraer(datos[k + (j * 10000)]);
+                }
+
+                stop = System.nanoTime();
+                salida4.write(Double.toString((stop - init) / 10000000.) + " ms");
+                salida4.newLine();
+                init = System.nanoTime();
+            }
+        }
+
+        for (int i = 0; i < arbolesb.length; i++) {
+            arbolesb[i].vaciar();
+        }
+
+        salida4.newLine();
+        salida4.write("[+] PRUEBA BÚSQUEDA EXITOSA");
+        salida4.newLine();
+        for (int i = 0; i < arbolesb.length; i++) {
+            salida4.write("Orden " + Orden[i] + " : ");
+            int j = 0, w = 10;
+            while (j < datos.length) {
+
+                for (int k = 0; k < 10000; k++, j++) {
+                    arbolesb[i].insertar(datos[j]);
+                }
+
+                init = System.nanoTime();
+
+                for (int l = 0; l < j; l++) {
+                    arbolesb[i].buscar(datos[l]);
+                }
+
+                stop = System.nanoTime();
+                salida4.write(Double.toString((stop - init) / (w * 1000000.)) + " ms");
+                w += 10;
+                salida4.newLine();
+            }
+        }
+
+        for (int i = 0; i < arbolesb.length; i++) {
+            arbolesb[i].vaciar();
+        }
+
+        salida4.newLine();
+        salida4.write("[+] PRUEBA BÚSQUEDA NO EXITOSA");
+        salida4.newLine();
+        for (int t = 0; t < arbolesb.length; t++) {
+            salida4.write("Orden " + Orden[t] + " : ");
+            for (int i = 0; i < 10; i++) {
+
+                for (int j = 0; j < 10000; j++)
+                    arbolesb[t].insertar(datos[j + (i * 10000)]);
+
+                init = System.nanoTime();
+
+                for (int k = 0; k < 500; k++) {
+                    for (int l = 0; l < 20000; l++)
+                        arbolesb[t].buscar(noDatos[l]);
+                }
+
+                stop = System.nanoTime();
+                salida4.write(Double.toString((stop - init) / (20000000 * 500.)) + " ms");
+                salida4.newLine();
+            }
+        }
+        salida4.close();
+        System.out.println("[!] FIN DE LA PRUEBA");
     }
 }
